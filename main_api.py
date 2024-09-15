@@ -93,21 +93,27 @@ def validate_authorization(authorization):
     if 'Bearer ' + system_auth_secret != authorization:
         raise HTTPException(status_code=401, detail="Authorization is error")
 
-
+# ！！！！爬虫后回调信息上传至supabase时，强制不使用代理环境
 async def async_worker(url, tags, languages, callback_url, key):
     # 爬虫处理封装为一个异步任务
     result = await website_crawler.scrape_website(url.strip(), tags, languages)
     # 通过requests post 请求调用call_back_url， 携带参数result， heaer 为key
+    logger.info(f'callback begin:{callback_url}')
     try:
-        logger.info(f'callback begin:{callback_url}')
-        response = requests.post(callback_url, json=result, headers={'Authorization': 'Bearer ' + key})
+        with requests.Session() as session:
+            session.trust_env = False  # 禁用环境中的代理设置
+            response = session.post(
+                callback_url,
+                json=result,
+                headers={'Authorization': 'Bearer ' + key},
+                timeout=30  # 添加超时设置
+            )
         if response.status_code != 200:
-            logger.error(f'callback error:{callback_url}', response.text)
+            logger.error(f'callback error:{callback_url}, status:{response.status_code}, response:{response.text}')
         else:
             logger.info(f'callback success:{callback_url}')
-    except Exception as e:
-        logger.error(f'call_back exception:{callback_url}', e)
-
+    except requests.exceptions.RequestException as e:
+        logger.error(f'callback exception:{callback_url}, error:{str(e)}')
 
 if __name__ == '__main__':
     import uvicorn

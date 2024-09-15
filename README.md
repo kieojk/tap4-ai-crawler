@@ -1,5 +1,7 @@
 # Tap4 AI Crawler
 
+# branch main是网上服务器部署的代码，branch local-deploy是本地电脑部署的代码（需要用代理），需要注意区分
+
 Tap4 AI Crawler is an open source web crawler built by [tap4.ai](https://tap4.ai), that will convert the website into the website summarize info with LLM. Includes powerful scraping, crawling and data extraction capabilities, web page screenshots. With Tap4 AI Crawler, you can not only easily update the ai tool detail for your AI Tools Directory but also summary of the website.
 
 This project is based on Python, very lightweight, easy to maintain, suitable for individual developers interested in AI tools directories, and also for learners interested in Python. We welcome everyone to fork and star.
